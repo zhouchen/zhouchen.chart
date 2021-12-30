@@ -63,6 +63,7 @@ namespace zhouchen.chart
         {
             set
             {
+                InitPara();
                 _bitmap = value;
                 if(_bitmap == null)
                 {
@@ -89,12 +90,12 @@ namespace zhouchen.chart
             {
                 try
                 {
-                    strImgPath = value;
                     if (_bitmap != null)
                     {
                         _bitmap.Dispose();
                     }
                     ImgData = (Bitmap)GetImage(strImgPath);
+                    strImgPath = value;
                 }
                 catch
                 {
@@ -114,8 +115,28 @@ namespace zhouchen.chart
 
         public List<ChartBase> LstChart = new List<ChartBase>();
 
+        // 当前选择的图形
+        public ChartBase _currChart = null;
+        public ChartBase CurrChart
+        {
+            get { return _currChart; } 
+            set
+            {
+                _currChart = value;
+                NotifyPropertyChanged("CurrChart");
+            }
+        }
+
         #endregion
 
+        private enum CLICK_AREA
+        {
+            AREA_UNKNOW,    // 未知区域
+            AREA_IMG,       // 图片区域
+            AREA_IMG_ROUTE, // 图片旋转区域
+
+        }
+        private CLICK_AREA _ClickArea = CLICK_AREA.AREA_UNKNOW;
 
         public ChartView()
         {
@@ -123,6 +144,23 @@ namespace zhouchen.chart
             SetStyle(ControlStyles.AllPaintingInWmPaint, true);
             SetStyle(ControlStyles.UserPaint, true);
             SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
+            InitPara();
+        }
+
+        private void InitPara()
+        {
+            _ClickArea = CLICK_AREA.AREA_UNKNOW;
+            _rcImg = new Rectangle(0, 0, 0, 0);
+            DScale = 1.0;
+            DRoute = 0.0;
+            _matrix.Reset();
+            strImgPath=String.Empty;
+            ImgData = null;
+            rcBgArea = new Rectangle();
+            _IsLeftDown = false;
+            _LastPt = new Point();
+            LstChart.Clear();
+            _currChart = null;
         }
 
         private Image GetImage(string filename)
