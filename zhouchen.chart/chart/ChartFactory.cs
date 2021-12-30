@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace zhouchen.chart.chart
 {
-    internal class ChartFactory
+    public class ChartFactory
     {
         public static ChartBase CreateChart(ChartType type, Point[] PtArr)
         {

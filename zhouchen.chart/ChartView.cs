@@ -123,16 +123,6 @@ namespace zhouchen.chart
             SetStyle(ControlStyles.AllPaintingInWmPaint, true);
             SetStyle(ControlStyles.UserPaint, true);
             SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
-
-            ChartBase chartTemp = null;
-
-            chartTemp = ChartFactory.CreateChart(ChartType.Chart_Straight, new Point[] { new Point(0,0),new Point(300,300) });
-            LstChart.Add(chartTemp);
-            chartTemp = ChartFactory.CreateChart(ChartType.Chart_Straight, new Point[] { new Point(300, 0), new Point(0, 300) });
-            LstChart.Add(chartTemp);
-
-            chartTemp = ChartFactory.CreateChart(ChartType.Chart_Rectangular, new Point[] { new Point(300, 300), new Point(600, 450) });
-            LstChart.Add(chartTemp);
         }
 
         private Image GetImage(string filename)
