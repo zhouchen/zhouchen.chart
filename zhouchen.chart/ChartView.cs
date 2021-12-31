@@ -94,7 +94,7 @@ namespace zhouchen.chart
                     {
                         _bitmap.Dispose();
                     }
-                    ImgData = (Bitmap)GetImage(strImgPath);
+                    ImgData = (Bitmap)GetImage(value);
                     strImgPath = value;
                 }
                 catch
@@ -155,8 +155,7 @@ namespace zhouchen.chart
             DRoute = 0.0;
             _matrix.Reset();
             strImgPath=String.Empty;
-            ImgData = null;
-            rcBgArea = new Rectangle();
+            _bitmap = null;
             _IsLeftDown = false;
             _LastPt = new Point();
             LstChart.Clear();
@@ -203,9 +202,11 @@ namespace zhouchen.chart
         private void ChartView_Paint(object sender, PaintEventArgs e)
         {
             Graphics graph = e.Graphics;
+            graph.SmoothingMode = SmoothingMode.HighQuality;
             // 双缓冲绘图
             Bitmap bmpChartView = new Bitmap(this.Width, this.Height);
             Graphics bmpChartView_g = Graphics.FromImage(bmpChartView);
+            bmpChartView_g.SmoothingMode = SmoothingMode.HighQuality;
 
             DrawView(bmpChartView_g);
             graph.DrawImage(bmpChartView, 0, 0);
@@ -276,6 +277,28 @@ namespace zhouchen.chart
                 if (_rcImg.Contains(points[0]))
                 {
                     _LastPt = points[0];
+                    _ClickArea = CLICK_AREA.AREA_IMG;
+                }
+                else
+                {
+                    Point[] ptRoute = new Point[] {
+                    new Point(_rcImg.Left,_rcImg.Top),
+                    new Point(_rcImg.Right,_rcImg.Top),
+                    new Point(_rcImg.Left,_rcImg.Bottom),
+                    new Point(_rcImg.Left,_rcImg.Bottom)
+                    };
+
+                    _matrix.TransformPoints(ptRoute);
+                    foreach (Point pt in ptRoute)
+                    {
+                        Rectangle rc = new Rectangle(pt.X - 10, pt.Y - 10, 20, 20);
+                        if(rc.Contains(e.Location))
+                        {
+                            _LastPt = points[0];
+                            _ClickArea = CLICK_AREA.AREA_IMG_ROUTE;
+                            break;
+                        }
+                    }
                 }
             }
         }
@@ -288,14 +311,39 @@ namespace zhouchen.chart
                 Matrix matrix_Invert = _matrix.Clone();
                 matrix_Invert.Invert();
                 matrix_Invert.TransformPoints(points);
-                _matrix.Translate((points[0].X - _LastPt.X), (points[0].Y - _LastPt.Y));
-                Console.WriteLine(_matrix.OffsetX + "," + _matrix.OffsetY);
+
+                switch(_ClickArea)
+                {
+                    case CLICK_AREA.AREA_IMG:
+                        {
+                            _matrix.Translate((points[0].X - _LastPt.X), (points[0].Y - _LastPt.Y));
+                           // _LastPt = points[0];
+                        }
+                        break;
+                    case CLICK_AREA.AREA_IMG_ROUTE:
+                        {
+                            double corrb = Math.Atan2(_LastPt.Y - _rcImg.Height / 2, _LastPt.X - _rcImg.Width / 2);
+                            double corre = Math.Atan2(points[0].Y - _rcImg.Height / 2, points[0].X - _rcImg.Width / 2);
+                            _matrix.RotateAt((float)((corre -corrb) *180.0f/Math.PI), new Point(_rcImg.Width / 2, _rcImg.Height / 2));
+                            DRoute += (Double)((corre - corrb) * 180.0f / Math.PI);
+                            Console.WriteLine(DRoute);
+                            //_LastPt= points[0];
+
+                        }
+                        break;
+                    default:
+                        break;
+
+                }
+                
+
                 Refresh();
             }
         }
 
         private void ChartView_MouseUp(object sender, MouseEventArgs e)
         {
+            _ClickArea = CLICK_AREA.AREA_UNKNOW;
             if (e.Button == MouseButtons.Left)
             {
                 _IsLeftDown = false;
