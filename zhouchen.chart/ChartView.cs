@@ -233,7 +233,7 @@ namespace zhouchen.chart
                 return;
             }
 
-            Bitmap bitImg = new Bitmap(_rcImg.Width, _rcImg.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            Bitmap bitImg = new Bitmap(rcBgArea.Width, rcBgArea.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
             Graphics bitImg_g = Graphics.FromImage(bitImg);
             bitImg_g.Transform = _matrix;
             bitImg_g.DrawImage(_bitmap, 0, 0);
@@ -390,7 +390,7 @@ namespace zhouchen.chart
 
             using (var graphPath = new GraphicsPath())
             {
-                graphPath.AddRectangle(new Rectangle(0, 0, _rcImg.Width, _rcImg.Height));
+                graphPath.AddRectangle(_rcImg);
                 graphPath.Transform(_matrix);
                 PointF[] pointFs = graphPath.PathPoints;
                 float fxmin = pointFs[0].X;
