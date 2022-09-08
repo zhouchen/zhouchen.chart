@@ -236,9 +236,9 @@ namespace zhouchen.chart
             Bitmap bitImg = new Bitmap(rcBgArea.Width, rcBgArea.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
             Graphics bitImg_g = Graphics.FromImage(bitImg);
             bitImg_g.Transform = _matrix;
-            bitImg_g.DrawImage(_bitmap, 0, 0);
+            bitImg_g.DrawImage(_bitmap, 0, 0, _bitmap.Width, _bitmap.Height);
 
-            graph.DrawImage(bitImg, rcBgArea.Left, rcBgArea.Top);
+            graph.DrawImage(bitImg, rcBgArea.Left, rcBgArea.Top, bitImg.Width, bitImg.Height);
 
             foreach(var chart in LstChart)
             {
